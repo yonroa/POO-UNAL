@@ -1,11 +1,14 @@
 class Calculos:
 
+  @staticmethod
   def calcular_salario_bruto(horas_labor, valor_hora):
     return (horas_labor * valor_hora)
 
+  @staticmethod
   def calcular_valor_retencion_fuente(porcentaje_retencion, salario_bruto):
     return ((salario_bruto * porcentaje_retencion) / 100)
 
+  @staticmethod
   def calcular_salario_neto(salario_bruto, valor_retencion_fuente):
     return (salario_bruto - valor_retencion_fuente)
 
