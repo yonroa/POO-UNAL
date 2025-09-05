@@ -1,10 +1,14 @@
+import math
+
 class Calculos:
 
+  @staticmethod
   def calcular_cuadrado(num):
-    return (num**2)
+    return (math.pow(num, 2))
 
+  @staticmethod
   def calcular_cubo(num):
-    return (num**3)
+    return (math.pow(num, 3))
 
 num = float(input("Ingrese el número:"))
 
