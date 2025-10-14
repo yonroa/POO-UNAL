@@ -32,7 +32,7 @@ class Cilindro(FiguraGeometrica):
   def calcular_volumen(self):
     return math.pi * (math.pow(self.radio, 2)) * self.altura
 
-  def calcular_superficie(self) -> float:
+  def calcular_superficie(self):
     area_lateral = 2.0 * math.pi * self.radio * self.altura
     area_bases = 2.0 * math.pi * (math.pow(self.radio, 2))
     return area_lateral + area_bases
@@ -138,7 +138,7 @@ class VentanaEsfera(tk.Toplevel):
 class VentanaPiramide(tk.Toplevel):
   def __init__(self, parent):
     super().__init__(parent)
-    self.title("Pirámide (base cuadrada)")
+    self.title("Pirámide")
     self.geometry("320x220")
     self.resizable(False, False)
 
