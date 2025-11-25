@@ -81,6 +81,102 @@ class BuscarAmigo:
         except FileNotFoundError:
             return []
 
+class ActualizarAmigo:
+
+    def __init__(self, nombre, telefono_nuevo):
+        self.nombre = nombre
+        self.telefono_nuevo = telefono_nuevo
+
+    def actualizar(self, ruta="amigos.txt"):
+        nombre_buscar = self.nombre.strip().lower()
+        telefono_nuevo = self.telefono_nuevo.strip()
+
+        if not telefono_nuevo:
+            return (False, "Debe indicar el nuevo teléfono.")
+        if not telefono_nuevo.isdigit():
+            return (False, "El teléfono debe contener solo dígitos.")
+
+        try:
+            with open(ruta, "r", encoding="utf-8") as f:
+                lineas = f.readlines()
+        except FileNotFoundError:
+            return (False, "No existe información de amigos para actualizar.")
+
+        for line in lineas:
+            stripped = line.strip()
+            if not stripped or ":" not in stripped:
+                continue
+            nombre_existente, telefono_existente = stripped.split(":", 1)
+            if nombre_existente.strip().lower() != nombre_buscar and telefono_existente.strip() == telefono_nuevo:
+                return (False, f"Ya existe un amigo con el teléfono '{telefono_nuevo}'.")
+
+
+        encontrado = False
+        nuevas_lineas = []
+        for line in lineas:
+            stripped = line.strip()
+            if not stripped or ":" not in stripped:
+                nuevas_lineas.append(line)
+                continue
+
+            nombre_existente, telefono_existente = stripped.split(":", 1)
+            if nombre_existente.strip().lower() == nombre_buscar:
+                nuevas_lineas.append(f"{nombre_existente}:{telefono_nuevo}\n")
+                encontrado = True
+            else:
+                nuevas_lineas.append(line)
+
+        if not encontrado:
+            return (False, f"No se encontró un amigo con el nombre '{self.nombre}'.")
+
+        try:
+            with open(ruta, "w", encoding="utf-8") as f:
+                f.writelines(nuevas_lineas)
+        except Exception as e:
+            return (False, f"Error al actualizar: {e}")
+
+        return (True, None)
+
+class BorrarAmigo:
+
+    def __init__(self, nombre):
+        self.nombre = nombre
+
+    def borrar(self, ruta="amigos.txt"):
+        nombre_borrar = self.nombre.strip().lower()
+
+        try:
+            with open(ruta, "r", encoding="utf-8") as f:
+                lineas = f.readlines()
+        except FileNotFoundError:
+            return (False, "No existe información de amigos para borrar.")
+
+        nuevas_lineas = []
+        eliminado = False
+
+        for line in lineas:
+            stripped = line.strip()
+            if not stripped or ":" not in stripped:
+                nuevas_lineas.append(line)
+                continue
+
+            nombre_existente, telefono_existente = stripped.split(":", 1)
+            if nombre_existente.strip().lower() == nombre_borrar:
+                eliminado = True
+            else:
+                nuevas_lineas.append(line)
+
+        if not eliminado:
+            return (False, f"No se encontró un amigo con el nombre '{self.nombre}'.")
+
+        try:
+            with open(ruta, "w", encoding="utf-8") as f:
+                f.writelines(nuevas_lineas)
+        except Exception as e:
+            return (False, f"Error al borrar: {e}")
+
+        return (True, None)
+
 
 class VentanaPrincipal(tk.Tk):
 
@@ -165,14 +261,37 @@ class VentanaPrincipal(tk.Tk):
             return
         messagebox.showinfo("Actualizar amigo", f"Actualizar: {nombre} - {telefono}")
 
+        actualizador = ActualizarAmigo(nombre, telefono)
+        ok, msg = actualizador.actualizar()
+        if ok:
+            messagebox.showinfo("Actualizar amigo", f"Datos actualizados para: {nombre}")
+            self.cmp_nombre.delete(0, tk.END)
+            self.cmp_numero.delete(0, tk.END)
+        else:
+            if msg:
+                messagebox.showerror("Actualizar amigo", msg)
+            else:
+                messagebox.showerror("Actualizar amigo", "No se pudo actualizar el amigo.")
+
     def borrar_amigo(self):
         nombre = self.cmp_nombre.get().strip()
         if not nombre:
             messagebox.showwarning("Borrar amigo", "Ingrese el nombre del amigo a borrar.")
             return
-        # confirmación simple
         if messagebox.askyesno("Borrar amigo", f"¿Eliminar a {nombre}?"):
             messagebox.showinfo("Borrar amigo", f"{nombre} eliminado.")
+
+        borrador = BorrarAmigo(nombre)
+        ok, msg = borrador.borrar()
+        if ok:
+            self.cmp_nombre.delete(0, tk.END)
+            self.cmp_numero.delete(0, tk.END)
+        else:
+            if msg:
+                messagebox.showerror("Borrar amigo", msg)
+            else:
+                messagebox.showerror("Borrar amigo", "No se pudo borrar el amigo.")
+
 
 class Principal:
 
